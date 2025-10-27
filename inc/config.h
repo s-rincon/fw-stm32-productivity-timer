@@ -24,7 +24,16 @@
 #define BUTTON_PIN                  13
 
 /* System Clock Configuration */
-#define SYSTEM_CLOCK_MHZ            168
-#define APB1_CLOCK_MHZ              84
+/* Note: Current implementation uses HSI (16 MHz) as system clock */
+/* For production, configure PLL to achieve higher frequencies */
+#define SYSTEM_CLOCK_HZ             16000000   /* 16 MHz HSI */
+#define APB1_CLOCK_HZ               16000000   /* Same as system clock without prescaler */
+
+/* Timer Configuration */
+#define TIMER_PRESCALER             ((APB1_CLOCK_HZ / 1000) - 1)  /* 1 kHz timer clock */
+#define TIMER_PERIOD                (1000 - 1)                     /* 1 second period */
+
+/* Delay Configuration */
+#define DELAY_CYCLES_PER_MS         (SYSTEM_CLOCK_HZ / 1000 / 4)  /* Approximate cycles for 1ms delay */
 
 #endif /* CONFIG_H */

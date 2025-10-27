@@ -36,7 +36,21 @@ void SystemInit(void)
     /* Disable all interrupts */
     RCC->CIR = 0x00000000;
 
-    /* Configure the System clock source, PLL Multiplier and Divider factors, 
-       AHB/APBx prescalers and Flash settings */
-    /* This can be enhanced to configure PLL for higher clock speeds */
+    /* Note: System clock configuration with PLL
+     * Currently using default HSI (16 MHz) clock
+     * For production use, configure PLL to achieve 168 MHz:
+     * 
+     * Example PLL configuration for 168 MHz from HSI (16 MHz):
+     * - PLLM = 16 (16 MHz / 16 = 1 MHz VCO input)
+     * - PLLN = 336 (1 MHz * 336 = 336 MHz VCO output)
+     * - PLLP = 2 (336 MHz / 2 = 168 MHz system clock)
+     * - PLLQ = 7 (336 MHz / 7 = 48 MHz for USB)
+     * 
+     * Uncomment and adapt the following for PLL configuration:
+     * RCC->PLLCFGR = (16 << 0) | (336 << 6) | (0 << 16) | (7 << 24);
+     * RCC->CR |= RCC_CR_PLLON;
+     * while(!(RCC->CR & RCC_CR_PLLRDY));
+     * RCC->CFGR |= RCC_CFGR_SW_PLL;
+     * while((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
+     */
 }

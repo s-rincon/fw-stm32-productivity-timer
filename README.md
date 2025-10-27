@@ -47,7 +47,8 @@ fw-stm32-productivity-timer/
 ├── inc/
 │   ├── stm32f4xx.h            # STM32F4 device definitions
 │   ├── timer.h                # Timer header
-│   └── gpio.h                 # GPIO header
+│   ├── gpio.h                 # GPIO header
+│   └── config.h               # Configuration constants
 ├── build/                      # Build output directory
 ├── STM32F407VG.ld             # Linker script
 ├── Makefile                   # Build configuration
@@ -104,7 +105,9 @@ fw-stm32-productivity-timer/
 
 ## How It Works
 
-The timer uses the STM32's TIM2 peripheral to generate accurate 1-second interrupts. The main application state machine manages transitions between work and break periods based on the Pomodoro Technique.
+The timer uses the STM32's TIM2 peripheral to generate accurate 1-second interrupts. The system currently runs on the default HSI clock (16 MHz), which provides sufficient accuracy for the timer application. The main application state machine manages transitions between work and break periods based on the Pomodoro Technique.
+
+**Note**: For production applications requiring higher performance, the system can be configured to use the PLL for higher clock speeds (up to 168 MHz). See `src/system_stm32f4xx.c` for PLL configuration instructions.
 
 ### Pomodoro Technique
 
@@ -115,12 +118,24 @@ The timer uses the STM32's TIM2 peripheral to generate accurate 1-second interru
 
 ## Customization
 
-You can customize the timer durations by modifying the values in `src/main.c`:
+You can customize the timer durations by modifying the values in `inc/config.h`:
 
 ```c
-Timer_Start(25);  // Work session (minutes)
-Timer_Start(5);   // Short break (minutes)
-Timer_Start(15);  // Long break (minutes)
+#define WORK_SESSION_DURATION       25    /* Work session (minutes) */
+#define SHORT_BREAK_DURATION        5     /* Short break (minutes) */
+#define LONG_BREAK_DURATION         15    /* Long break (minutes) */
+#define SESSIONS_BEFORE_LONG_BREAK  4     /* Sessions before long break */
+```
+
+You can also customize the pin assignments:
+
+```c
+#define LED_WORK_PORT               GPIOA
+#define LED_WORK_PIN                5
+#define LED_BREAK_PORT              GPIOA
+#define LED_BREAK_PIN               6
+#define BUTTON_PORT                 GPIOC
+#define BUTTON_PIN                  13
 ```
 
 ## About Fastbit Embedded Academy

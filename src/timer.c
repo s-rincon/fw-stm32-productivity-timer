@@ -6,6 +6,7 @@
 
 #include "timer.h"
 #include "stm32f4xx.h"
+#include "config.h"
 
 static uint32_t timerMinutes = 0;
 static uint32_t timerSeconds = 0;
@@ -19,10 +20,15 @@ void Timer_Init(void)
     /* Enable TIM2 clock */
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
     
-    /* Configure TIM2 for 1 second interrupts */
-    /* Assuming 84 MHz APB1 clock */
-    TIM2->PSC = 42000 - 1;  /* Prescaler */
-    TIM2->ARR = 2000 - 1;   /* Auto-reload register for 1 second */
+    /* Configure TIM2 for 1 second interrupts
+     * Timer calculation: 
+     * - APB1 clock is divided by (PSC + 1) to get timer clock
+     * - Timer overflows when CNT reaches (ARR + 1)
+     * - Total period = (PSC + 1) * (ARR + 1) / APB1_CLOCK
+     * - For 1 second: (16000) * (1000) / 16000000 = 1 second
+     */
+    TIM2->PSC = TIMER_PRESCALER;  /* Prescaler for 1 kHz timer clock */
+    TIM2->ARR = TIMER_PERIOD;     /* Auto-reload for 1 second period */
     
     /* Enable update interrupt */
     TIM2->DIER |= TIM_DIER_UIE;

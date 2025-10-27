@@ -8,6 +8,7 @@
 #include "stm32f4xx.h"
 #include "timer.h"
 #include "gpio.h"
+#include "config.h"
 
 /* Timer states */
 typedef enum {
@@ -49,7 +50,7 @@ int main(void)
                 if(GPIO_ReadButton())
                 {
                     currentState = TIMER_WORK;
-                    Timer_Start(25); /* 25 minutes work session */
+                    Timer_Start(WORK_SESSION_DURATION);
                     GPIO_SetLED(1); /* Turn on work LED */
                 }
                 break;
@@ -62,15 +63,15 @@ int main(void)
                     GPIO_SetLED(0); /* Turn off work LED */
                     
                     /* Decide on break type */
-                    if(workSessions % 4 == 0)
+                    if(workSessions % SESSIONS_BEFORE_LONG_BREAK == 0)
                     {
                         currentState = TIMER_LONG_BREAK;
-                        Timer_Start(15); /* 15 minutes long break */
+                        Timer_Start(LONG_BREAK_DURATION);
                     }
                     else
                     {
                         currentState = TIMER_SHORT_BREAK;
-                        Timer_Start(5); /* 5 minutes short break */
+                        Timer_Start(SHORT_BREAK_DURATION);
                     }
                     GPIO_SetLED(2); /* Turn on break LED */
                 }
@@ -101,11 +102,15 @@ int main(void)
 /**
  * @brief Simple delay function
  * @param ms Delay time in milliseconds
+ * @note This is an approximate delay based on the system clock
  */
 void delay_ms(uint32_t ms)
 {
-    /* Assuming 168 MHz system clock */
-    for(uint32_t i = 0; i < ms * 42000; i++)
+    /* Using configured delay cycles per millisecond
+     * Note: Actual delay may vary due to compiler optimizations
+     * For precise delays, use hardware timers
+     */
+    for(uint32_t i = 0; i < ms * DELAY_CYCLES_PER_MS; i++)
     {
         __NOP();
     }
