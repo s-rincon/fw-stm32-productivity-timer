@@ -1,0 +1,38 @@
+@startuml ProTimer_StateMachine
+!theme plain
+skinparam backgroundColor white
+skinparam state {
+    BackgroundColor<<idle>> LightYellow
+    BackgroundColor<<time_set>> LightYellow
+    BackgroundColor<<stats>> LightYellow
+    BackgroundColor<<paused>> LightYellow
+    BackgroundColor<<countdown>> LightYellow
+}
+
+state "Pro Timer System" as ProTimer {
+    
+    [*] --> IDLE
+    
+    state "IDLE" as IDLE <<idle>> {
+
+    }
+    
+    state "TIME_SET" as TIME_SET <<time_set>> {
+
+    }
+    
+    state "PAUSE" as PAUSE <<paused>> {
+
+    }
+
+    state "COUNTDOWN" as COUNTDOWN <<countdown>> {
+
+    }
+
+    state "STATS" as STATS <<stats>> {
+
+    }
+
+}
+
+@enduml
