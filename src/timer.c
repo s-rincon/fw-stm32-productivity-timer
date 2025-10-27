@@ -24,8 +24,9 @@ void Timer_Init(void)
      * Timer calculation: 
      * - APB1 clock is divided by (PSC + 1) to get timer clock
      * - Timer overflows when CNT reaches (ARR + 1)
-     * - Total period = (PSC + 1) * (ARR + 1) / APB1_CLOCK
-     * - For 1 second: (16000) * (1000) / 16000000 = 1 second
+     * - Total period = (PSC + 1) * (ARR + 1) / APB1_CLOCK_HZ
+     * - Example with current config: (TIMER_PRESCALER + 1) * (TIMER_PERIOD + 1) / APB1_CLOCK_HZ
+     *   = 16000 * 1000 / 16000000 = 1 second
      */
     TIM2->PSC = TIMER_PRESCALER;  /* Prescaler for 1 kHz timer clock */
     TIM2->ARR = TIMER_PERIOD;     /* Auto-reload for 1 second period */

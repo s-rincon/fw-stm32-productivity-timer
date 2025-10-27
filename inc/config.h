@@ -30,6 +30,8 @@
 #define APB1_CLOCK_HZ               16000000   /* Same as system clock without prescaler */
 
 /* Timer Configuration */
+/* Prescaler calculation: divides APB1 clock to get 1 kHz timer frequency */
+/* ARR (Auto-Reload Register) set for 1 second period at 1 kHz */
 #define TIMER_PRESCALER             ((APB1_CLOCK_HZ / 1000) - 1)  /* 1 kHz timer clock */
 #define TIMER_PERIOD                (1000 - 1)                     /* 1 second period */
 
