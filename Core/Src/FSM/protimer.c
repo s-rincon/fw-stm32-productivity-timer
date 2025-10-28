@@ -54,11 +54,26 @@ static void protimer_state_machine(protimer_t * const mobj, const protimer_event
     
 }
 
+static void protimer_initial_transition(protimer_t * const mobj) {
+    if (mobj == NULL) {
+        return;
+    }
+
+    // Execute transition action
+    mobj->worked_time = 0;
+
+    // Transition to IDLE state
+    mobj->active_state = PROTIMER_STATE_IDLE;
+
+    // Optionally, you can dispatch an ENTRY event to the new state here
+    protimer_event_t entry_event = { .signal = PROTIMER_SIGNAL_ENTRY };
+    protimer_dispatch(mobj, &entry_event);
+}
+
 void protimer_dispatch(protimer_t * const mobj, const protimer_event_t * const evt) {
     if ((mobj == NULL) || (evt == NULL)) {
         return;
     }
-    // Dispatch the event to the state machine and handle transition if any
 }
 
 void protimer_init(protimer_t * const mobj) {
@@ -66,5 +81,7 @@ void protimer_init(protimer_t * const mobj) {
         return;
     }
 
-    // Initialize the protimer and handle initial transition to IDLE state
+    memset(mobj, 0, sizeof(protimer_t));
+
+    protimer_initial_transition(mobj);
 }
