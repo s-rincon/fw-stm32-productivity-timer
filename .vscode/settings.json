@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.dsl": "c4",
+        "productivity_timer_hsm": "cpp"
+    }
+}
