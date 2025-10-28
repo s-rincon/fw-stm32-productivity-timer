@@ -2,6 +2,10 @@
     "files.associations": {
         "*.dsl": "c4",
         "productivity_timer_hsm": "cpp",
-        "button_simulation.h": "c"
+        "button_simulation.h": "c",
+        "stdio.h": "c",
+        "stdint.h": "c",
+        "string.h": "c",
+        "stdlib.h": "c"
     }
 }

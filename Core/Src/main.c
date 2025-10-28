@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "lcd_simulation.h"
 
 /* USER CODE END Includes */
 
@@ -89,6 +90,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  display_init();
 
   /* USER CODE END 2 */
 
