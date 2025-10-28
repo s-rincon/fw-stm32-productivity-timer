@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.dsl": "c4",
-        "productivity_timer_hsm": "cpp"
+        "productivity_timer_hsm": "cpp",
+        "button_simulation.h": "c"
     }
 }
