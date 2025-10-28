@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd_simulation.h"
+#include "protimer.h"
 
 /* USER CODE END Includes */
 
@@ -44,6 +45,7 @@
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
+static protimer_t protimer;
 
 /* USER CODE END PV */
 
@@ -91,6 +93,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   display_init();
+  protimer_init(&protimer);
 
   /* USER CODE END 2 */
 
