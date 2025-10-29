@@ -36,11 +36,12 @@ void display_show(void)
 
 void display_time(uint32_t time)
 {
-    uint8_t minutes = time/60;
-    uint8_t seconds = time%60;
+    uint8_t hours = time / 3600;
+    uint8_t minutes = (time % 3600) / 60;
+    uint8_t seconds = time % 60;
 
-    char time_string[8];
-    snprintf(time_string, 8, "%03d:%02d", minutes, seconds);
+    char time_string[10];
+    snprintf(time_string, 10, "%02d:%02d:%02d", hours, minutes, seconds);
     center_text(time_string, current_time_displayed, 31);
 }
 
