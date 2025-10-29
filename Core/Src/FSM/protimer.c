@@ -20,7 +20,7 @@ static void protimer_stats_state_handler(protimer_t * const mobj, const protimer
 
 }
 
-static void protimer_state_machine(protimer_t * const mobj, const protimer_event_t * const evt) {
+static protimer_event_status_t protimer_state_machine(protimer_t * const mobj, const protimer_event_t * const evt) {
     if ((mobj == NULL) || (evt == NULL)) {
         return;
     }
@@ -51,9 +51,25 @@ static void protimer_state_machine(protimer_t * const mobj, const protimer_event
             mobj->active_state = PROTIMER_STATE_IDLE;
             break;
     }
+
+    return PROTIMER_EVENT_IGNORED;
     
 }
 
+/**
+ * @brief Perform the initial transition of the state machine
+ * 
+ * Executes the initial transition from the implicit start state to the IDLE state.
+ * This includes executing transition actions and dispatching the entry event to 
+ * the initial state (IDLE).
+ * 
+ * @param[in,out] mobj Pointer to the protimer object
+ * 
+ * @details Transition sequence:
+ *          1. Execute transition action (initialize worked_time to 0)
+ *          2. Set active_state to PROTIMER_STATE_IDLE
+ *          3. Dispatch ENTRY event to IDLE state
+ */
 static void protimer_initial_transition(protimer_t * const mobj) {
     if (mobj == NULL) {
         return;
@@ -73,6 +89,20 @@ static void protimer_initial_transition(protimer_t * const mobj) {
 void protimer_dispatch(protimer_t * const mobj, const protimer_event_t * const evt) {
     if ((mobj == NULL) || (evt == NULL)) {
         return;
+    }
+
+    protimer_state_t source_state = mobj->active_state;
+    protimer_event_status_t status = protimer_state_machine(mobj, evt);
+    protimer_state_t target_state = mobj->active_state;
+
+    if (status == PROTIMER_EVENT_TRANSITION) {
+        protimer_event_t exit_event = { .signal = PROTIMER_SIGNAL_EXIT };
+        mobj->active_state = source_state;
+        protimer_state_machine(mobj, &exit_event);
+
+        protimer_event_t entry_event = { .signal = PROTIMER_SIGNAL_ENTRY };
+        mobj->active_state = target_state;
+        protimer_state_machine(mobj, &entry_event);
     }
 }
 
