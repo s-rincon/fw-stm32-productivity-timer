@@ -70,7 +70,34 @@ static protimer_event_status_t protimer_pause_state_handler(protimer_t * const m
 }
 
 static protimer_event_status_t protimer_stats_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
-    return PROTIMER_EVENT_IGNORED;
+    if ((mobj == NULL) || (evt == NULL)) {
+        return PROTIMER_EVENT_IGNORED;
+    }
+
+    switch (evt->signal) {
+        case PROTIMER_SIGNAL_ENTRY:
+            display_time(mobj->worked_time);
+            display_message("Worked Time:");
+            display_show();
+            return PROTIMER_EVENT_HANDLED;
+
+        case PROTIMER_SIGNAL_EXIT:
+            display_clear();
+            display_show();
+            return PROTIMER_EVENT_HANDLED;
+
+        case PROTIMER_SIGNAL_TIME_TICK:
+            static uint8_t time_tick_ss = 0;
+            if (++time_tick_ss >= 30) {
+                time_tick_ss = 0;
+                protimer_set_active_state(mobj, PROTIMER_STATE_IDLE);
+                return PROTIMER_EVENT_TRANSITION;
+            }
+            return PROTIMER_EVENT_IGNORED;
+
+        default:
+            return PROTIMER_EVENT_IGNORED;
+    }
 }
 
 static protimer_event_status_t protimer_state_machine(protimer_t * const mobj, const protimer_event_t * const evt) {
@@ -125,7 +152,7 @@ static void protimer_initial_transition(protimer_t * const mobj) {
     mobj->worked_time = 0;
 
     // Transition to IDLE state
-    mobj->active_state = PROTIMER_STATE_IDLE;
+    protimer_set_active_state(mobj, PROTIMER_STATE_IDLE);
 
     // Optionally, you can dispatch an ENTRY event to the new state here
     protimer_event_t entry_event = { .signal = PROTIMER_SIGNAL_ENTRY };

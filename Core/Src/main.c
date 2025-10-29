@@ -62,6 +62,14 @@ static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN 0 */
 
 /**
+ * @brief Retarget printf to UART1
+*/
+int _write(int file, char *ptr, int len) {
+  HAL_UART_Transmit(&huart1, (uint8_t *) ptr, len, HAL_MAX_DELAY);
+  return len;
+}
+
+/**
  * @brief User button event producer
  * 
  * Polls the button interface and generates corresponding events for the
@@ -77,7 +85,7 @@ static void MX_USART1_UART_Init(void);
  * @note This function should be called periodically from the main loop
  */
 static void user_event_producer(void) {
-  button_id_t button_pressed = get_pressed_button();
+  button_id_t button_pressed = button_get_pressed();
 
   protimer_event_t user_event;
 
