@@ -64,7 +64,13 @@ static protimer_event_status_t protimer_time_set_state_handler(protimer_t * cons
 
     switch (evt->signal) {
         case PROTIMER_SIGNAL_ENTRY:
+            display_message("Set Time");
             display_time(mobj->current_time);
+            display_show();
+            return PROTIMER_EVENT_HANDLED;
+
+        case PROTIMER_SIGNAL_EXIT:
+            display_clear();
             display_show();
             return PROTIMER_EVENT_HANDLED;
 
@@ -101,11 +107,97 @@ static protimer_event_status_t protimer_time_set_state_handler(protimer_t * cons
 }
 
 static protimer_event_status_t protimer_countdown_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
-    return PROTIMER_EVENT_IGNORED;
+    if ((mobj == NULL) || (evt == NULL)) {
+        return PROTIMER_EVENT_IGNORED;
+    }
+
+    switch (evt->signal) {
+        case PROTIMER_SIGNAL_ENTRY:
+            display_message("Working...");
+            display_time(mobj->current_time);
+            display_show();
+            return PROTIMER_EVENT_HANDLED;
+
+        case PROTIMER_SIGNAL_EXIT:
+            mobj->worked_time += mobj->elapsed_time;
+            mobj->elapsed_time = 0;
+            display_clear();
+            display_show();
+            return PROTIMER_EVENT_HANDLED;
+
+        case PROTIMER_SIGNAL_ABORT:
+            protimer_set_active_state(mobj, PROTIMER_STATE_IDLE);
+            return PROTIMER_EVENT_TRANSITION;
+
+        case PROTIMER_SIGNAL_START_PAUSE:
+            protimer_set_active_state(mobj, PROTIMER_STATE_PAUSE);
+            return PROTIMER_EVENT_TRANSITION;
+
+        case PROTIMER_SIGNAL_TIME_TICK:
+            static uint8_t time_tick_ss = 0;
+            if (++time_tick_ss < 10) {
+                return PROTIMER_EVENT_IGNORED;
+            }
+
+            time_tick_ss = 0;
+            mobj->elapsed_time++;
+            mobj->current_time--;
+
+            if (mobj->current_time == 0) {
+                protimer_set_active_state(mobj, PROTIMER_STATE_IDLE);
+                return PROTIMER_EVENT_TRANSITION;
+
+            } else {
+                display_time(mobj->current_time);
+                display_show();
+                return PROTIMER_EVENT_HANDLED;
+            }
+
+        default:
+            return PROTIMER_EVENT_IGNORED;
+    }
 }
 
 static protimer_event_status_t protimer_pause_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
-    return PROTIMER_EVENT_IGNORED;
+    if ((mobj == NULL) || (evt == NULL)) {
+        return PROTIMER_EVENT_IGNORED;
+    }
+
+    switch (evt->signal) {
+        case PROTIMER_SIGNAL_ENTRY:
+            display_message("Paused");
+            display_show();
+            return PROTIMER_EVENT_HANDLED;
+
+        case PROTIMER_SIGNAL_EXIT:
+            display_clear();
+            display_show();
+            return PROTIMER_EVENT_HANDLED;
+
+        case PROTIMER_SIGNAL_START_PAUSE:
+            protimer_set_active_state(mobj, PROTIMER_STATE_COUNTDOWN);
+            return PROTIMER_EVENT_TRANSITION;
+
+        case PROTIMER_SIGNAL_ABORT:
+            protimer_set_active_state(mobj, PROTIMER_STATE_IDLE);
+            return PROTIMER_EVENT_TRANSITION;
+
+        case PROTIMER_SIGNAL_INC_TIME:
+            mobj->current_time += 60;
+            protimer_set_active_state(mobj, PROTIMER_STATE_TIME_SET);
+            return PROTIMER_EVENT_TRANSITION;
+
+        case PROTIMER_SIGNAL_DEC_TIME:
+            if (mobj->current_time >= 60) {
+                mobj->current_time -= 60;
+                protimer_set_active_state(mobj, PROTIMER_STATE_TIME_SET);
+                return PROTIMER_EVENT_TRANSITION;
+            }
+            return PROTIMER_EVENT_IGNORED;
+
+        default:
+            return PROTIMER_EVENT_IGNORED;
+    }
 }
 
 static protimer_event_status_t protimer_stats_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {

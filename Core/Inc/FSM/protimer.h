@@ -101,8 +101,6 @@ typedef struct protimer_ {
     uint32_t current_time;  /**< Current countdown time remaining (in seconds) */
     uint32_t elapsed_time;  /**< Time elapsed in the current work session (in seconds) */
 
-    uint32_t tick;  /**< General-purpose tick counter for timing operations */
-
 } protimer_t;
 
 /**
