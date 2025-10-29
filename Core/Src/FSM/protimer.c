@@ -58,6 +58,45 @@ static protimer_event_status_t protimer_idle_state_handler(protimer_t * const mo
 }
 
 static protimer_event_status_t protimer_time_set_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
+    if ((mobj == NULL) || (evt == NULL)) {
+        return PROTIMER_EVENT_IGNORED;
+    }
+
+    switch (evt->signal) {
+        case PROTIMER_SIGNAL_ENTRY:
+            display_time(mobj->current_time);
+            display_show();
+            return PROTIMER_EVENT_HANDLED;
+
+        case PROTIMER_SIGNAL_INC_TIME:
+            mobj->current_time += 60;
+            display_time(mobj->current_time);
+            display_show();
+            return PROTIMER_EVENT_HANDLED;
+
+        case PROTIMER_SIGNAL_DEC_TIME:
+            if (mobj->current_time >= 60) {
+                mobj->current_time -= 60;
+                display_time(mobj->current_time);
+                display_show();
+                return PROTIMER_EVENT_HANDLED;
+            }
+            return PROTIMER_EVENT_IGNORED;
+
+        case PROTIMER_SIGNAL_START_PAUSE:
+            if (mobj->current_time > 0) {
+                protimer_set_active_state(mobj, PROTIMER_STATE_COUNTDOWN);
+                return PROTIMER_EVENT_TRANSITION;
+            }
+            return PROTIMER_EVENT_IGNORED;
+
+        case PROTIMER_SIGNAL_ABORT:
+            protimer_set_active_state(mobj, PROTIMER_STATE_IDLE);
+            return PROTIMER_EVENT_TRANSITION;
+
+        default:
+            return PROTIMER_EVENT_IGNORED;
+    }
     return PROTIMER_EVENT_IGNORED;
 }
 
