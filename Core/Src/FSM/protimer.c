@@ -1,58 +1,104 @@
 #include "protimer.h"
 
-static void protimer_idle_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
+#include <string.h>
 
+#include "lcd_simulation.h"
+#include "main.h"
+
+/** Simulation for do beep routine, this should me moved out of the  */
+static void do_beep(void) {
+    HAL_GPIO_WritePin(LED_USER_GPIO_Port, LED_USER_Pin, GPIO_PIN_SET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED_USER_GPIO_Port, LED_USER_Pin, GPIO_PIN_RESET);
 }
 
-static void protimer_time_set_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
+static void protimer_set_active_state(protimer_t * const mobj, protimer_state_t state) {
+    if (mobj == NULL) {
+        return;
+    }
 
+    mobj->active_state = state;
 }
 
-static void protimer_countdown_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
+static protimer_event_status_t protimer_idle_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
+    if ((mobj == NULL) || (evt == NULL)) {
+        return PROTIMER_EVENT_IGNORED;
+    }
 
+    switch (evt->signal) {
+        case PROTIMER_SIGNAL_ENTRY:
+            mobj->current_time = 0;
+            mobj->elapsed_time = 0;
+            display_time(0);
+            display_message("Set Time");
+            display_show();
+            return PROTIMER_EVENT_HANDLED;
+
+        case PROTIMER_SIGNAL_EXIT:
+            display_clear();
+            display_show();
+            return PROTIMER_EVENT_HANDLED;
+
+        case PROTIMER_SIGNAL_INC_TIME:
+            mobj->current_time += 60;
+            protimer_set_active_state(mobj, PROTIMER_STATE_TIME_SET);
+            return PROTIMER_EVENT_TRANSITION;
+
+        case PROTIMER_SIGNAL_START_PAUSE:
+            protimer_set_active_state(mobj, PROTIMER_STATE_STATS);
+            return PROTIMER_EVENT_TRANSITION;
+
+        case PROTIMER_SIGNAL_TIME_TICK:
+            // \todo implement tick
+            return PROTIMER_EVENT_HANDLED;
+
+        default:
+            return PROTIMER_EVENT_IGNORED;
+    }
 }
 
-static void protimer_pause_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
-
+static protimer_event_status_t protimer_time_set_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
+    return PROTIMER_EVENT_IGNORED;
 }
 
-static void protimer_stats_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
+static protimer_event_status_t protimer_countdown_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
+    return PROTIMER_EVENT_IGNORED;
+}
 
+static protimer_event_status_t protimer_pause_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
+    return PROTIMER_EVENT_IGNORED;
+}
+
+static protimer_event_status_t protimer_stats_state_handler(protimer_t * const mobj, const protimer_event_t * const evt) {
+    return PROTIMER_EVENT_IGNORED;
 }
 
 static protimer_event_status_t protimer_state_machine(protimer_t * const mobj, const protimer_event_t * const evt) {
     if ((mobj == NULL) || (evt == NULL)) {
-        return;
+        return PROTIMER_EVENT_IGNORED;
     }
 
     switch (mobj->active_state) {
         case PROTIMER_STATE_IDLE:
-            protimer_idle_state_handler(mobj, evt);
-            break;
+            return protimer_idle_state_handler(mobj, evt);
 
         case PROTIMER_STATE_TIME_SET:
-            protimer_time_set_state_handler(mobj, evt);
-            break;
+            return protimer_time_set_state_handler(mobj, evt);
 
         case PROTIMER_STATE_COUNTDOWN:
-            protimer_countdown_state_handler(mobj, evt);
-            break;
+            return protimer_countdown_state_handler(mobj, evt);
 
         case PROTIMER_STATE_PAUSE:
-            protimer_pause_state_handler(mobj, evt);
-            break;
+            return protimer_pause_state_handler(mobj, evt);
 
         case PROTIMER_STATE_STATS:
-            protimer_stats_state_handler(mobj, evt);
-            break;
+            return protimer_stats_state_handler(mobj, evt);
 
         default:
             // Unknown state, reset to IDLE
             mobj->active_state = PROTIMER_STATE_IDLE;
-            break;
+            return PROTIMER_EVENT_IGNORED;
     }
-
-    return PROTIMER_EVENT_IGNORED;
     
 }
 
