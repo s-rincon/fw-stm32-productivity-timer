@@ -129,10 +129,10 @@ static void protimer_initial_transition(protimer_t * const mobj) {
 
     // Optionally, you can dispatch an ENTRY event to the new state here
     protimer_event_t entry_event = { .signal = PROTIMER_SIGNAL_ENTRY };
-    protimer_dispatch(mobj, &entry_event);
+    protimer_dispatcher(mobj, &entry_event);
 }
 
-void protimer_dispatch(protimer_t * const mobj, const protimer_event_t * const evt) {
+void protimer_dispatcher(protimer_t * const mobj, const protimer_event_t * const evt) {
     if ((mobj == NULL) || (evt == NULL)) {
         return;
     }

@@ -129,6 +129,6 @@ void protimer_init(protimer_t *const mobj);
  * @param[in,out] mobj Pointer to the protimer object
  * @param[in] event Pointer to the event to process
  */
-void protimer_dispatch(protimer_t *const mobj, const protimer_event_t *const event);
+void protimer_dispatcher(protimer_t *const mobj, const protimer_event_t *const event);
 
 #endif /* __PROTIMER_INC_ */

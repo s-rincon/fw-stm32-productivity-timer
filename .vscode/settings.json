@@ -7,6 +7,7 @@
         "stdint.h": "c",
         "string.h": "c",
         "stdlib.h": "c",
-        "protimer.h": "c"
+        "protimer.h": "c",
+        "lcd_simulation.h": "c"
     }
 }
