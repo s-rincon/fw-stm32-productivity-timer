@@ -24,6 +24,7 @@
 #include "lcd_simulation.h"
 #include "button_simulation.h"
 #include "protimer.h"
+#include "alarm_simulation.h"
 
 /* USER CODE END Includes */
 
@@ -175,6 +176,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    alarm_task();
     user_event_producer();
     time_tick_event_producer();
     /* USER CODE END WHILE */

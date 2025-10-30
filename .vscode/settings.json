@@ -8,6 +8,8 @@
         "string.h": "c",
         "stdlib.h": "c",
         "protimer.h": "c",
-        "lcd_simulation.h": "c"
+        "lcd_simulation.h": "c",
+        "alarm_simulation.h": "c",
+        "stdbool.h": "c"
     }
 }

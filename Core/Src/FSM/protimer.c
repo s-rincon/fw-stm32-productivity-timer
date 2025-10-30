@@ -3,14 +3,8 @@
 #include <string.h>
 
 #include "lcd_simulation.h"
+#include "alarm_simulation.h"
 #include "main.h"
-
-/** Simulation for do beep routine, this should me moved out of the  */
-static void do_beep(void) {
-    HAL_GPIO_WritePin(LED_USER_GPIO_Port, LED_USER_Pin, GPIO_PIN_SET);
-    HAL_Delay(100);
-    HAL_GPIO_WritePin(LED_USER_GPIO_Port, LED_USER_Pin, GPIO_PIN_RESET);
-}
 
 static void protimer_set_active_state(protimer_t * const mobj, protimer_state_t state) {
     if (mobj == NULL) {
@@ -35,6 +29,7 @@ static protimer_event_status_t protimer_idle_state_handler(protimer_t * const mo
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_EXIT:
+            alarm_stop();
             display_clear();
             display_show();
             return PROTIMER_EVENT_HANDLED;
@@ -144,6 +139,7 @@ static protimer_event_status_t protimer_countdown_state_handler(protimer_t * con
             mobj->current_time--;
 
             if (mobj->current_time == 0) {
+                alarm_start();
                 protimer_set_active_state(mobj, PROTIMER_STATE_IDLE);
                 return PROTIMER_EVENT_TRANSITION;
 
