@@ -22,7 +22,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd_simulation.h"
+#include "button_simulation.h"
 #include "protimer.h"
+#include "alarm_simulation.h"
 
 /* USER CODE END Includes */
 
@@ -59,6 +61,79 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+/**
+ * @brief Retarget printf to UART1
+*/
+int _write(int file, char *ptr, int len) {
+  HAL_UART_Transmit(&huart1, (uint8_t *) ptr, len, HAL_MAX_DELAY);
+  return len;
+}
+
+/**
+ * @brief User button event producer
+ * 
+ * Polls the button interface and generates corresponding events for the
+ * productivity timer state machine based on user button presses.
+ * 
+ * @details Button to event mapping:
+ *          - BUTTON_ID_PLUS       -> PROTIMER_SIGNAL_INC_TIME
+ *          - BUTTON_ID_MINUS      -> PROTIMER_SIGNAL_DEC_TIME
+ *          - BUTTON_ID_START_PAUSE -> PROTIMER_SIGNAL_START_PAUSE
+ *          - BUTTON_ID_BOTH       -> PROTIMER_SIGNAL_ABORT
+ *          - No button pressed    -> No event dispatched
+ * 
+ * @note This function should be called periodically from the main loop
+ */
+static void user_event_producer(void) {
+  button_id_t button_pressed = button_get_pressed();
+
+  protimer_event_t user_event;
+
+  if (button_pressed == BUTTON_ID_PLUS) {
+    user_event.signal = PROTIMER_SIGNAL_INC_TIME;
+
+  } else if (button_pressed == BUTTON_ID_MINUS) {
+    user_event.signal = PROTIMER_SIGNAL_DEC_TIME;
+
+  } else if (button_pressed == BUTTON_ID_START_PAUSE) {
+    user_event.signal = PROTIMER_SIGNAL_START_PAUSE;
+
+  } else if (button_pressed == BUTTON_ID_BOTH) {
+    user_event.signal = PROTIMER_SIGNAL_ABORT;
+
+  } else {
+    return;
+  }
+
+  protimer_dispatcher(&protimer, &user_event);
+}
+
+/**
+ * @brief Periodic time tick event producer
+ * 
+ * Generates periodic TIME_TICK events every 100ms for the productivity timer
+ * state machine. Uses HAL_GetTick() to track elapsed time and dispatch events
+ * at regular intervals.
+ * 
+ * @details The tick interval is 100ms, which provides the time base for:
+ *          - Countdown updates
+ *          - Idle state beep timing
+ *          - Elapsed time tracking
+ * 
+ * @note This function should be called continuously from the main loop
+ * @note Uses static variables to maintain timing state between calls
+ */
+static void time_tick_event_producer(void) {
+  static uint32_t current_tick = 100;
+  static protimer_event_t tick_event = { .signal = PROTIMER_SIGNAL_TIME_TICK };
+
+  if (HAL_GetTick() > current_tick) {
+    current_tick = HAL_GetTick() + 100;
+    protimer_dispatcher(&protimer, &tick_event);
+
+  }
+}
 
 /* USER CODE END 0 */
 
@@ -101,6 +176,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    alarm_task();
+    user_event_producer();
+    time_tick_event_producer();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

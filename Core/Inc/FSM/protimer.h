@@ -101,8 +101,6 @@ typedef struct protimer_ {
     uint32_t current_time;  /**< Current countdown time remaining (in seconds) */
     uint32_t elapsed_time;  /**< Time elapsed in the current work session (in seconds) */
 
-    uint32_t tick;  /**< General-purpose tick counter for timing operations */
-
 } protimer_t;
 
 /**
@@ -121,9 +119,14 @@ void protimer_init(protimer_t *const mobj);
  * Processes an event according to the current state's behavior.
  * May result in state transitions and/or data updates.
  * 
+ * When a state transition occurs, actions are executed in this order:
+ * 1. Transition action (handled by the current state)
+ * 2. Exit action of the source state
+ * 3. Entry action of the target state
+ * 
  * @param[in,out] mobj Pointer to the protimer object
  * @param[in] event Pointer to the event to process
  */
-void protimer_dispatch(protimer_t *const mobj, const protimer_event_t *const event);
+void protimer_dispatcher(protimer_t *const mobj, const protimer_event_t *const event);
 
 #endif /* __PROTIMER_INC_ */
