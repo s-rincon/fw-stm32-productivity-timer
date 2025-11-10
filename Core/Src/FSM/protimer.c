@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include "lcd_simulation.h"
+#include "display.h"
 #include "alarm_simulation.h"
 #include "main.h"
 
@@ -24,14 +24,12 @@ static protimer_event_status_t protimer_idle_state_handler(protimer_t * const mo
             mobj->current_time = 0;
             mobj->elapsed_time = 0;
             display_time(0);
-            display_message("Set Time");
-            display_show();
+            display_message("SET TIME");
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_EXIT:
             alarm_stop();
             display_clear();
-            display_show();
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_INC_TIME:
@@ -59,27 +57,23 @@ static protimer_event_status_t protimer_time_set_state_handler(protimer_t * cons
 
     switch (evt->signal) {
         case PROTIMER_SIGNAL_ENTRY:
-            display_message("Set Time");
+            display_message("SET TIME");
             display_time(mobj->current_time);
-            display_show();
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_EXIT:
             display_clear();
-            display_show();
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_INC_TIME:
             mobj->current_time += 60;
             display_time(mobj->current_time);
-            display_show();
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_DEC_TIME:
             if (mobj->current_time >= 60) {
                 mobj->current_time -= 60;
                 display_time(mobj->current_time);
-                display_show();
                 return PROTIMER_EVENT_HANDLED;
             }
             return PROTIMER_EVENT_IGNORED;
@@ -108,16 +102,14 @@ static protimer_event_status_t protimer_countdown_state_handler(protimer_t * con
 
     switch (evt->signal) {
         case PROTIMER_SIGNAL_ENTRY:
-            display_message("Working...");
+            display_message("WORKING");
             display_time(mobj->current_time);
-            display_show();
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_EXIT:
             mobj->worked_time += mobj->elapsed_time;
             mobj->elapsed_time = 0;
             display_clear();
-            display_show();
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_ABORT:
@@ -145,7 +137,6 @@ static protimer_event_status_t protimer_countdown_state_handler(protimer_t * con
 
             } else {
                 display_time(mobj->current_time);
-                display_show();
                 return PROTIMER_EVENT_HANDLED;
             }
 
@@ -161,13 +152,11 @@ static protimer_event_status_t protimer_pause_state_handler(protimer_t * const m
 
     switch (evt->signal) {
         case PROTIMER_SIGNAL_ENTRY:
-            display_message("Paused");
-            display_show();
+            display_message("PAUSED");
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_EXIT:
             display_clear();
-            display_show();
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_START_PAUSE:
@@ -204,13 +193,11 @@ static protimer_event_status_t protimer_stats_state_handler(protimer_t * const m
     switch (evt->signal) {
         case PROTIMER_SIGNAL_ENTRY:
             display_time(mobj->worked_time);
-            display_message("Worked Time:");
-            display_show();
+            display_message("WORKED TIME");
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_EXIT:
             display_clear();
-            display_show();
             return PROTIMER_EVENT_HANDLED;
 
         case PROTIMER_SIGNAL_TIME_TICK:

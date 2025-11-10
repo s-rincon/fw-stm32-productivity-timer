@@ -61,6 +61,10 @@ void Error_Handler(void);
 #define LED_HEARTBEAT_GPIO_Port GPIOG
 #define LED_USER_Pin GPIO_PIN_14
 #define LED_USER_GPIO_Port GPIOG
+#define LCD_SCL_Pin GPIO_PIN_8
+#define LCD_SCL_GPIO_Port GPIOB
+#define LCD_SDA_Pin GPIO_PIN_9
+#define LCD_SDA_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

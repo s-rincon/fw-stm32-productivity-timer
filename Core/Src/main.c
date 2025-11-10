@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "lcd_simulation.h"
+#include "display.h"
 #include "button_simulation.h"
 #include "protimer.h"
 #include "alarm_simulation.h"

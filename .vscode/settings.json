@@ -10,6 +10,7 @@
         "protimer.h": "c",
         "lcd_simulation.h": "c",
         "alarm_simulation.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "display.h": "c"
     }
 }
